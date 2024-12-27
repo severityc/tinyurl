@@ -1,3 +1,31 @@
+// Utility to encode a string (similar to what you've shown)
+function encodeString(str, key) {
+    let encoded = '';
+    for (let i = 0; i < str.length; i++) {
+        let charCode = str.charCodeAt(i);
+        let keyChar = btoa(key).charCodeAt(i % key.length);
+        keyChar = keyChar % 256;
+        charCode = charCode ^ keyChar;
+        encoded += String.fromCharCode(charCode);
+    }
+    return btoa(btoa(encoded)); // Double base64 encoding for extra obfuscation
+}
+
+// Utility to decode a string
+function decodeString(encodedStr, key) {
+    let decoded = '';
+    encodedStr = atob(atob(encodedStr)); // Reverse the double base64 encoding
+    for (let i = 0; i < decoded.length; i++) {
+        let charCode = decoded.charCodeAt(i);
+        let keyChar = btoa(key).charCodeAt(i % key.length);
+        keyChar = keyChar % 256;
+        charCode = charCode ^ keyChar;
+        decoded += String.fromCharCode(charCode);
+    }
+    return decoded;
+}
+
+// Function to generate short URL and store mapping in localStorage
 function generateShortURL() {
     const longUrl = document.getElementById("long-url").value;
     
@@ -6,12 +34,12 @@ function generateShortURL() {
         return;
     }
 
-    // Generate a random 6-character string for the short URL
-    const randomString = Math.random().toString(36).substring(2, 8);
-    const shortUrl = `${window.location.origin}/#${randomString}`;
+    // Generate a short URL using a simple hash-like approach
+    const shortCode = Math.random().toString(36).substring(2, 8); // Random short code
+    const shortUrl = `${window.location.origin}/#${shortCode}`;
 
-    // Save the long URL to localStorage with the short URL as the key
-    localStorage.setItem(randomString, longUrl);
+    // Store the long URL in localStorage with the short URL code
+    localStorage.setItem(shortCode, longUrl);
 
     // Display the result
     const resultDiv = document.getElementById("result");
@@ -22,7 +50,7 @@ function generateShortURL() {
     resultDiv.style.display = "block";
 }
 
-// Function to handle URL redirection when visiting short URL
+// Redirect based on the short URL hash
 window.onload = function() {
     const hash = window.location.hash.substring(1);
     if (hash) {
