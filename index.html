@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Simple URL Shortener</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>URL Shortener</h1>
+        <p>Enter a long URL to get a short version</p>
+
+        <div class="input-container">
+            <input type="text" id="long-url" placeholder="Enter your long URL here" />
+            <button onclick="generateShortURL()">Shorten URL</button>
+        </div>
+
+        <div class="result" id="result" style="display: none;">
+            <p>Your short URL:</p>
+            <a href="#" id="short-url" target="_blank"></a>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
