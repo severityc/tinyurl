@@ -1,4 +1,4 @@
-// Utility to encode a string (similar to what you've shown)
+// Custom encoding function (XOR and Base64 encoding)
 function encodeString(str, key) {
     let encoded = '';
     for (let i = 0; i < str.length; i++) {
@@ -8,24 +8,10 @@ function encodeString(str, key) {
         charCode = charCode ^ keyChar;
         encoded += String.fromCharCode(charCode);
     }
-    return btoa(btoa(encoded)); // Double base64 encoding for extra obfuscation
+    return btoa(btoa(encoded)); // Double base64 encoding for added obfuscation
 }
 
-// Utility to decode a string
-function decodeString(encodedStr, key) {
-    let decoded = '';
-    encodedStr = atob(atob(encodedStr)); // Reverse the double base64 encoding
-    for (let i = 0; i < decoded.length; i++) {
-        let charCode = decoded.charCodeAt(i);
-        let keyChar = btoa(key).charCodeAt(i % key.length);
-        keyChar = keyChar % 256;
-        charCode = charCode ^ keyChar;
-        decoded += String.fromCharCode(charCode);
-    }
-    return decoded;
-}
-
-// Function to generate short URL and store mapping in localStorage
+// Function to generate a short URL
 function generateShortURL() {
     const longUrl = document.getElementById("long-url").value;
     
@@ -34,14 +20,19 @@ function generateShortURL() {
         return;
     }
 
-    // Generate a short URL using a simple hash-like approach
-    const shortCode = Math.random().toString(36).substring(2, 8); // Random short code
+    // Generate a short URL code (random 6-character string)
+    const shortCode = Math.random().toString(36).substring(2, 8); 
+
+    // You can encode the long URL to obfuscate it (using XOR encoding)
+    const encodedLongUrl = encodeString(longUrl, shortCode); 
+
+    // Store the mapping in localStorage
+    localStorage.setItem(shortCode, encodedLongUrl);
+
+    // Generate the final short URL
     const shortUrl = `${window.location.origin}/#${shortCode}`;
 
-    // Store the long URL in localStorage with the short URL code
-    localStorage.setItem(shortCode, longUrl);
-
-    // Display the result
+    // Display the short URL
     const resultDiv = document.getElementById("result");
     const shortUrlElement = document.getElementById("short-url");
     shortUrlElement.href = shortUrl;
@@ -50,15 +41,30 @@ function generateShortURL() {
     resultDiv.style.display = "block";
 }
 
-// Redirect based on the short URL hash
+// Handle redirection based on the short URL hash
 window.onload = function() {
     const hash = window.location.hash.substring(1);
     if (hash) {
-        const longUrl = localStorage.getItem(hash);
-        if (longUrl) {
-            window.location.href = longUrl; // Redirect to the long URL
+        const encodedLongUrl = localStorage.getItem(hash);
+        if (encodedLongUrl) {
+            const decodedUrl = decodeString(encodedLongUrl, hash); // Decode the URL
+            window.location.href = decodedUrl; // Redirect to the long URL
         } else {
             alert("This short URL doesn't exist.");
         }
     }
 };
+
+// Custom decoding function (XOR and Base64 decoding)
+function decodeString(encodedStr, key) {
+    let decoded = '';
+    encodedStr = atob(atob(encodedStr)); // Reverse the double base64 encoding
+    for (let i = 0; i < encodedStr.length; i++) {
+        let charCode = encodedStr.charCodeAt(i);
+        let keyChar = btoa(key).charCodeAt(i % key.length);
+        keyChar = keyChar % 256;
+        charCode = charCode ^ keyChar;
+        decoded += String.fromCharCode(charCode);
+    }
+    return decoded;
+}
