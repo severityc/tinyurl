@@ -1,2 +1,2 @@
 # tinyurl
-roblox url shortener
+url shortener inspired by tinyurl.com
